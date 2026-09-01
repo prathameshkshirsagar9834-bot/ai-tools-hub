@@ -1,0 +1,850 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>AI Tools Hub</title>
+
+<style>
+*{
+  margin:0;
+  padding:0;
+  box-sizing:border-box;
+  font-family:Arial,sans-serif;
+}
+
+body{
+  background:#080b14;
+  color:white;
+  min-height:100vh;
+}
+
+header{
+  padding:28px 18px 18px;
+}
+
+.top{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+}
+
+.logo{
+  font-size:27px;
+  font-weight:800;
+}
+
+.logo span{
+  color:#7c6cff;
+}
+
+.tag{
+  margin-top:7px;
+  color:#8e96a8;
+  font-size:13px;
+}
+
+.fav-count{
+  border:1px solid #353d54;
+  background:#121725;
+  padding:9px 12px;
+  border-radius:12px;
+  font-size:13px;
+}
+
+.hero{
+  margin:10px 18px 20px;
+  padding:22px;
+  border:1px solid #30374d;
+  border-radius:22px;
+  background:linear-gradient(135deg,#151a2d,#0f1320);
+}
+
+.hero h1{
+  font-size:25px;
+  line-height:1.2;
+}
+
+.hero h1 span{
+  color:#8c80ff;
+}
+
+.hero p{
+  color:#9299aa;
+  margin-top:8px;
+  font-size:13px;
+  line-height:1.5;
+}
+
+.search-area{
+  padding:0 18px 18px;
+}
+
+#search{
+  width:100%;
+  padding:15px 17px;
+  border:1px solid #30374d;
+  border-radius:15px;
+  outline:none;
+  background:#121725;
+  color:white;
+  font-size:15px;
+}
+
+#search:focus{
+  border-color:#7c6cff;
+  box-shadow:0 0 20px rgba(124,108,255,.18);
+}
+
+.categories{
+  display:flex;
+  gap:9px;
+  overflow-x:auto;
+  padding:0 18px 20px;
+}
+
+.categories::-webkit-scrollbar{
+  display:none;
+}
+
+.category{
+  flex-shrink:0;
+  padding:10px 15px;
+  border-radius:30px;
+  border:1px solid #30374d;
+  background:#101522;
+  color:white;
+  transition:.2s;
+}
+
+.category:active{
+  transform:scale(.92);
+}
+
+.category.active{
+  background:#7c6cff;
+  border-color:#7c6cff;
+}
+
+.section-title{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  padding:5px 18px 14px;
+}
+
+.section-title h2{
+  font-size:19px;
+}
+
+.section-title span{
+  color:#7c6cff;
+  font-size:12px;
+}
+
+.tools{
+  display:grid;
+  grid-template-columns:repeat(2,1fr);
+  gap:14px;
+  padding:0 18px 35px;
+}
+
+.card{
+  position:relative;
+  background:#121725;
+  border:1px solid #272f43;
+  border-radius:19px;
+  padding:16px;
+  transition:.25s;
+}
+
+.card:hover{
+  transform:translateY(-4px);
+  border-color:#7c6cff;
+}
+
+.icon{
+  width:47px;
+  height:47px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  background:#1b2032;
+  border-radius:14px;
+  font-size:24px;
+  margin-bottom:11px;
+}
+
+.card h3{
+  font-size:16px;
+  margin-bottom:6px;
+  padding-right:25px;
+}
+
+.card p{
+  color:#9299aa;
+  font-size:12px;
+  line-height:1.5;
+  min-height:38px;
+}
+
+.favorite{
+  position:absolute;
+  right:12px;
+  top:12px;
+  width:31px;
+  height:31px;
+  border-radius:50%;
+  border:1px solid #343c53;
+  background:#171d2c;
+  color:#9ca4b6;
+  font-size:16px;
+  transition:.2s;
+}
+
+.favorite:active{
+  transform:scale(.8);
+}
+
+.favorite.active{
+  color:#ffd84d;
+  border-color:#ffd84d;
+}
+
+.open-btn{
+  width:100%;
+  margin-top:13px;
+  padding:10px;
+  border-radius:11px;
+  border:1px solid #7c6cff;
+  background:transparent;
+  color:white;
+  transition:.2s;
+}
+
+.open-btn:hover{
+  background:#7c6cff;
+}
+
+.open-btn:active{
+  transform:scale(.93);
+}
+
+.no-result{
+  display:none;
+  grid-column:1/-1;
+  text-align:center;
+  color:#8e96a8;
+  padding:40px 10px;
+}
+
+footer{
+  border-top:1px solid #202638;
+  text-align:center;
+  color:#737b8e;
+  font-size:12px;
+  padding:25px 15px;
+}
+
+@media(max-width:400px){
+  .tools{
+    grid-template-columns:1fr;
+  }
+}
+</style>
+</head>
+
+<body>
+
+<header>
+
+  <div class="top">
+    <div>
+      <div class="logo">AI <span>Tools Hub</span></div>
+      <div class="tag">Discover powerful AI tools</div>
+    </div>
+
+    <div class="fav-count">
+      ⭐ <span id="favCount">0</span>
+    </div>
+  </div>
+
+</header>
+
+<section class="hero">
+  <h1>Explore the <span>AI World</span> 🤖</h1>
+  <p>
+    Writing, images, videos and coding — useful AI tools
+    collected in one place.
+  </p>
+</section>
+
+<div class="search-area">
+  <input
+    id="search"
+    type="text"
+    placeholder="🔍 Search AI tools..."
+  >
+</div>
+
+<div class="categories">
+
+  <button class="category active" data-category="all">
+    All
+  </button>
+
+  <button class="category" data-category="writing">
+    ✍️ Writing
+  </button>
+
+  <button class="category" data-category="image">
+    🎨 Image
+  </button>
+
+  <button class="category" data-category="video">
+    🎬 Video
+  </button>
+
+  <button class="category" data-category="coding">
+    💻 Coding
+  </button>
+
+</div>
+
+<div class="section-title">
+  <h2>🔥 Popular AI Tools</h2>
+  <span id="toolCount">20 Tools</span>
+</div>
+
+<main class="tools" id="tools">
+
+<!-- 1 -->
+
+<div class="card" data-category="writing">
+<button class="favorite">☆</button>
+
+<div class="icon">🤖</div>
+<h3>ChatGPT</h3>
+<p>AI assistant for writing, questions and ideas.</p>
+
+<button class="open-btn"
+onclick="openTool('https://chatgpt.com')">
+Open Tool
+</button>
+</div>
+
+
+<!-- 2 -->
+
+<div class="card" data-category="writing">
+<button class="favorite">☆</button>
+
+<div class="icon">🧠</div>
+<h3>Claude</h3>
+<p>AI assistant for writing and analysis.</p>
+
+<button class="open-btn"
+onclick="openTool('https://claude.ai')">
+Open Tool
+</button>
+</div>
+
+
+<!-- 3 -->
+
+<div class="card" data-category="writing">
+<button class="favorite">☆</button>
+
+<div class="icon">✨</div>
+<h3>Gemini</h3>
+<p>Google AI assistant for everyday tasks.</p>
+
+<button class="open-btn"
+onclick="openTool('https://gemini.google.com')">
+Open Tool
+</button>
+</div>
+
+
+<!-- 4 -->
+
+<div class="card" data-category="writing">
+<button class="favorite">☆</button>
+
+<div class="icon">🔎</div>
+<h3>Perplexity</h3>
+<p>AI search and research assistant.</p>
+
+<button class="open-btn"
+onclick="openTool('https://www.perplexity.ai')">
+Open Tool
+</button>
+</div>
+
+
+<!-- 5 -->
+
+<div class="card" data-category="writing">
+<button class="favorite">☆</button>
+
+<div class="icon">✍️</div>
+<h3>Jasper</h3>
+<p>AI-powered content creation platform.</p>
+
+<button class="open-btn"
+onclick="openTool('https://www.jasper.ai')">
+Open Tool
+</button>
+</div>
+
+
+<!-- 6 -->
+
+<div class="card" data-category="writing">
+<button class="favorite">☆</button>
+
+<div class="icon">📝</div>
+<h3>Grammarly</h3>
+<p>AI writing and grammar assistance.</p>
+
+<button class="open-btn"
+onclick="openTool('https://www.grammarly.com')">
+Open Tool
+</button>
+</div>
+
+
+<!-- 7 -->
+
+<div class="card" data-category="image">
+<button class="favorite">☆</button>
+
+<div class="icon">🎨</div>
+<h3>Canva AI</h3>
+<p>Create designs and images using AI.</p>
+
+<button class="open-btn"
+onclick="openTool('https://www.canva.com')">
+Open Tool
+</button>
+</div>
+
+
+<!-- 8 -->
+
+<div class="card" data-category="image">
+<button class="favorite">☆</button>
+
+<div class="icon">🔥</div>
+<h3>Adobe Firefly</h3>
+<p>Generate creative images with AI.</p>
+
+<button class="open-btn"
+onclick="openTool('https://firefly.adobe.com')">
+Open Tool
+</button>
+</div>
+
+
+<!-- 9 -->
+
+<div class="card" data-category="image">
+<button class="favorite">☆</button>
+
+<div class="icon">🌈</div>
+<h3>Leonardo AI</h3>
+<p>Create AI-generated visual content.</p>
+
+<button class="open-btn"
+onclick="openTool('https://leonardo.ai')">
+Open Tool
+</button>
+</div>
+
+
+<!-- 10 -->
+
+<div class="card" data-category="image">
+<button class="favorite">☆</button>
+
+<div class="icon">🪄</div>
+<h3>Ideogram</h3>
+<p>Create creative AI images and designs.</p>
+
+<button class="open-btn"
+onclick="openTool('https://ideogram.ai')">
+Open Tool
+</button>
+</div>
+
+
+<!-- 11 -->
+
+<div class="card" data-category="image">
+<button class="favorite">☆</button>
+
+<div class="icon">🖼️</div>
+<h3>Freepik AI</h3>
+<p>Create AI images and creative content.</p>
+
+<button class="open-btn"
+onclick="openTool('https://www.freepik.com')">
+Open Tool
+</button>
+</div>
+
+
+<!-- 12 -->
+
+<div class="card" data-category="video">
+<button class="favorite">☆</button>
+
+<div class="icon">🎬</div>
+<h3>Runway</h3>
+<p>Create and edit videos using AI.</p>
+
+<button class="open-btn"
+onclick="openTool('https://runwayml.com')">
+Open Tool
+</button>
+</div>
+
+
+<!-- 13 -->
+
+<div class="card" data-category="video">
+<button class="favorite">☆</button>
+
+<div class="icon">🎥</div>
+<h3>Pika</h3>
+<p>Generate creative AI videos.</p>
+
+<button class="open-btn"
+onclick="openTool('https://pika.art')">
+Open Tool
+</button>
+</div>
+
+
+<!-- 14 -->
+
+<div class="card" data-category="video">
+<button class="favorite">☆</button>
+
+<div class="icon">📹</div>
+<h3>HeyGen</h3>
+<p>Create AI avatar videos.</p>
+
+<button class="open-btn"
+onclick="openTool('https://www.heygen.com')">
+Open Tool
+</button>
+</div>
+
+
+<!-- 15 -->
+
+<div class="card" data-category="video">
+<button class="favorite">☆</button>
+
+<div class="icon">🎞️</div>
+<h3>CapCut</h3>
+<p>AI-powered video editing tools.</p>
+
+<button class="open-btn"
+onclick="openTool('https://www.capcut.com')">
+Open Tool
+</button>
+</div>
+
+
+<!-- 16 -->
+
+<div class="card" data-category="video">
+<button class="favorite">☆</button>
+
+<div class="icon">🌟</div>
+<h3>VEED</h3>
+<p>Create and edit videos with AI.</p>
+
+<button class="open-btn"
+onclick="openTool('https://www.veed.io')">
+Open Tool
+</button>
+</div>
+
+
+<!-- 17 -->
+
+<div class="card" data-category="coding">
+<button class="favorite">☆</button>
+
+<div class="icon">💻</div>
+<h3>GitHub Copilot</h3>
+<p>AI coding assistant for developers.</p>
+
+<button class="open-btn"
+onclick="openTool('https://github.com/features/copilot')">
+Open Tool
+</button>
+</div>
+
+
+<!-- 18 -->
+
+<div class="card" data-category="coding">
+<button class="favorite">☆</button>
+
+<div class="icon">⚡</div>
+<h3>Replit AI</h3>
+<p>Build projects with AI assistance.</p>
+
+<button class="open-btn"
+onclick="openTool('https://replit.com')">
+Open Tool
+</button>
+</div>
+
+
+<!-- 19 -->
+
+<div class="card" data-category="coding">
+<button class="favorite">☆</button>
+
+<div class="icon">🧑‍💻</div>
+<h3>Cursor</h3>
+<p>AI-powered code editor.</p>
+
+<button class="open-btn"
+onclick="openTool('https://cursor.com')">
+Open Tool
+</button>
+</div>
+
+
+<!-- 20 -->
+
+<div class="card" data-category="coding">
+<button class="favorite">☆</button>
+
+<div class="icon">🔧</div>
+<h3>Codeium</h3>
+<p>AI coding assistance for developers.</p>
+
+<button class="open-btn"
+onclick="openTool('https://codeium.com')">
+Open Tool
+</button>
+</div>
+
+
+<div class="no-result" id="noResult">
+😕 कोई tool नहीं मिला
+</div>
+
+</main>
+
+<footer>
+© 2026 AI Tools Hub
+<br>
+Built for AI discovery 🚀
+</footer>
+
+
+<script>
+
+const search =
+document.getElementById("search");
+
+const cards =
+document.querySelectorAll(".card");
+
+const categories =
+document.querySelectorAll(".category");
+
+const noResult =
+document.getElementById("noResult");
+
+const favCount =
+document.getElementById("favCount");
+
+const toolCount =
+document.getElementById("toolCount");
+
+let selectedCategory = "all";
+
+
+/* SEARCH + CATEGORY */
+
+function filterTools(){
+
+  const text =
+  search.value.toLowerCase().trim();
+
+  let visible = 0;
+
+  cards.forEach(card => {
+
+    const name =
+    card.querySelector("h3")
+    .innerText
+    .toLowerCase();
+
+    const description =
+    card.querySelector("p")
+    .innerText
+    .toLowerCase();
+
+    const category =
+    card.dataset.category;
+
+    const searchMatch =
+    name.includes(text) ||
+    description.includes(text);
+
+    const categoryMatch =
+    selectedCategory === "all" ||
+    category === selectedCategory;
+
+    if(searchMatch && categoryMatch){
+
+      card.style.display = "block";
+
+      visible++;
+
+    }else{
+
+      card.style.display = "none";
+
+    }
+
+  });
+
+  noResult.style.display =
+  visible === 0 ? "block" : "none";
+
+  toolCount.innerText =
+  visible + " Tools";
+}
+
+
+search.addEventListener(
+  "input",
+  filterTools
+);
+
+
+/* CATEGORY BUTTONS */
+
+categories.forEach(button => {
+
+  button.addEventListener(
+    "click",
+    () => {
+
+      categories.forEach(btn =>
+        btn.classList.remove("active")
+      );
+
+      button.classList.add("active");
+
+      selectedCategory =
+      button.dataset.category;
+
+      filterTools();
+
+    }
+  );
+
+});
+
+
+/* FAVORITES */
+
+let favorites =
+JSON.parse(
+localStorage.getItem("aiFavorites") || "[]"
+);
+
+
+function updateFavorites(){
+
+  favCount.innerText =
+  favorites.length;
+
+}
+
+
+cards.forEach(card => {
+
+  const button =
+  card.querySelector(".favorite");
+
+  const name =
+  card.querySelector("h3").innerText;
+
+  if(favorites.includes(name)){
+
+    button.classList.add("active");
+
+    button.innerText = "★";
+
+  }
+
+  button.addEventListener(
+    "click",
+    () => {
+
+      if(favorites.includes(name)){
+
+        favorites =
+        favorites.filter(
+          item => item !== name
+        );
+
+        button.classList.remove("active");
+
+        button.innerText = "☆";
+
+      }else{
+
+        favorites.push(name);
+
+        button.classList.add("active");
+
+        button.innerText = "★";
+
+      }
+
+      localStorage.setItem(
+        "aiFavorites",
+        JSON.stringify(favorites)
+      );
+
+      updateFavorites();
+
+    }
+  );
+
+});
+
+
+updateFavorites();
+
+
+/* OPEN TOOL */
+
+function openTool(url){
+
+  window.open(
+    url,
+    "_blank"
+  );
+
+}
+
+</script>
+
+</body>
+</html>
