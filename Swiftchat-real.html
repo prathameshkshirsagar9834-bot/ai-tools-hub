@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>SwiftChat REAL</title>
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
+<style>
+body{margin:0;font-family:Arial;background:#111;color:#fff;height:100vh;display:flex;flex-direction:column}
+#join{height:100vh;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:15px;background:#000}
+#join input{padding:14px 20px;border-radius:10px;border:1px solid #333;background:#1a1a1a;color:#fff;width:250px;text-align:center}
+#join button{padding:14px 30px;border-radius:10px;border:none;background:linear-gradient(90deg,#00f5ff,#7c3aed);color:#fff;font-weight:900;cursor:pointer}
+#app{display:none;flex:1;flex-direction:column}
+#top{padding:12px;background:#1f1f1f;display:flex;justify-content:space-between}
+#msgs{flex:1;padding:15px;overflow:auto;display:flex;flex-direction:column;gap:8px}
+.me{align-self:flex-end;background:linear-gradient(90deg,#00f5ff,#7c3aed);padding:8px 14px;border-radius:15px;max-width:70%}
+.you{align-self:flex-start;background:#222;padding:8px 14px;border-radius:15px;max-width:70%}
+#bar{padding:10px;background:#1a1a1a;display:flex;gap:8px}
+#bar input{flex:1;padding:12px;border-radius:25px;border:none;background:#222;color:#fff;outline:none}
+#bar button{width:45px;height:45px;border-radius:50%;border:none;background:#00f5ff}
+</style>
+</head>
+<body>
+<div id="join">
+<div style="font-size:40px">⚡</div><h1>SwiftChat</h1>
+<input id="name" placeholder="Tumhara Naam">
+<input id="room" placeholder="Room ID (jaise: dosti123)">
+<button onclick="join()">Chat Start Karo</button>
+<p style="font-size:12px;color:#666">Same Room ID dusre ko do, sath chat hogi</p>
+</div>
+<div id="app">
+<div id="top"><b>Room: <span id="roomName"></span></b><span id="myName"></span></div>
+<div id="msgs"></div>
+<div id="bar"><input id="msg" placeholder="Message..."><button onclick="send()">></button></div>
+</div>
+<script>
+// FREE PUBLIC DATABASE - kaam karega
+const firebaseConfig = { databaseURL: "https://swiftchat-demo-default-rtdb.firebaseio.com" };
+firebase.initializeApp(firebaseConfig);
+let db = firebase.database();
+let myName, roomId;
+function join(){
+myName=document.getElementById('name').value||'User';
+roomId=document.getElementById('room').value||'general';
+if(!roomId){alert('Room ID likho');return;}
+document.getElementById('join').style.display='none';
+document.getElementById('app').style.display='flex';
+document.getElementById('roomName').innerText=roomId;
+document.getElementById('myName').innerText=myName;
+db.ref('rooms/'+roomId).on('child_added', snap=>{
+let d=snap.val();
+let div=document.createElement('div');
+div.className=d.name==myName?'me':'you';
+div.innerHTML=`<b style="font-size:10px;display:block">${d.name}</b>${d.text}`;
+document.getElementById('msgs').appendChild(div);
+document.getElementById('msgs').scrollTop=99999;
+});
+}
+function send(){
+let t=document.getElementById('msg').value;if(!t)return;
+db.ref('rooms/'+roomId).push({name:myName,text:t,time:Date.now()});
+document.getElementById('msg').value='';
+}
+document.getElementById('msg').addEventListener('keydown',e=>{if(e.key=='Enter')send()});
+</script>
+</body>
+</html>
