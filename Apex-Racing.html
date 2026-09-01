@@ -1,84 +1,69 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>APEX RACING - Drift & Nitro</title>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>APEX RACING - Pro Roads</title>
 <style>
-  body{margin:0;background:#0a0a0a;color:white;font-family:Arial;overflow:hidden}
-  #game{width:100vw;height:100vh;position:relative;background:linear-gradient(#111,#222)}
-  canvas{width:100%;height:100%}
-  #hud{position:absolute;top:10px;left:10px;right:10px;display:flex;justify-content:space-between;font-weight:bold}
-  #controls{position:absolute;bottom:10px;width:100%;display:flex;justify-content:space-between;padding:0 20px;box-sizing:border-box}
- .btn{width:80px;height:80px;background:rgba(255,255,255,0.1);border:2px solid #0ff;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:30px;user-select:none}
-  #nitro{background:rgba(255,0,100,0.3);border-color:#f0f}
+body{margin:0;background:#0a0a0a;color:#fff;font-family:Arial;overflow:hidden}
+canvas{width:100vw;height:100vh;display:block}
+#hud{position:absolute;top:0;left:0;right:0;padding:12px;display:flex;justify-content:space-between;font-weight:900;text-shadow:0 0 10px #0ff}
+#bar{position:absolute;bottom:0;left:0;right:0;height:6px;background:#222}
+#prog{height:100%;width:0%;background:linear-gradient(90deg,#0ff,#f0f);box-shadow:0 0 20px #0ff}
+.btn{position:absolute;width:90px;height:90px;border-radius:50%;border:2px solid #0ff;background:rgba(0,255,255,0.1);display:flex;align-items:center;justify-content:center;font-size:32px;user-select:none}
+#l{left:20px;bottom:20px}#r{left:125px;bottom:20px}#a{right:125px;bottom:20px}#n{right:20px;bottom:20px;border-color:#f0f;background:rgba(255,0,255,0.15)}
 </style>
 </head>
 <body>
-<div id="game">
-  <div id="hud">
-    <div>SPEED: <span id="speed">0</span> KM/H</div>
-    <div>NITRO: <span id="nitroVal">100</span>%</div>
-    <div>LAP: <span id="lap">1/3</span></div>
-  </div>
-  <canvas id="c"></canvas>
-  <div id="controls">
-    <div style="display:flex;gap:10px"><div class="btn" id="left">◀</div><div class="btn" id="right">▶</div></div>
-    <div style="display:flex;gap:10px"><div class="btn" id="nitro">⚡</div><div class="btn" id="acc">▲</div></div>
-  </div>
-</div>
+<div id="hud"><div id="sp">0 KM/H</div><div id="dr">DRIFT 0</div><div id="lp">LAP 1/3</div></div>
+<div id="bar"><div id="prog"></div></div>
+<canvas id="c"></canvas>
+<div class="btn" id="l">◀</div><div class="btn" id="r">▶</div><div class="btn" id="a">▲</div><div class="btn" id="n">⚡</div>
 <script>
-// Simple Drift Racing Logic
-const canvas=document.getElementById('c'),ctx=canvas.getContext('2d');
-canvas.width=innerWidth;canvas.height=innerHeight;
-let x=canvas.width/2,y=canvas.height-150,angle=0,speed=0,nitro=100,drift=0;
-let keys={};
-function loop(){
-  ctx.fillStyle='#1a1a1a';ctx.fillRect(0,0,canvas.width,canvas.height);
-  // road
-  ctx.fillStyle='#333';ctx.fillRect(canvas.width/2-150,0,300,canvas.height);
-  ctx.strokeStyle='white';ctx.setLineDash([20,20]);ctx.beginPath();ctx.moveTo(canvas.width/2,0);ctx.lineTo(canvas.width/2,canvas.height);ctx.stroke();ctx.setLineDash([]);
-
-  if(keys['ArrowUp']||keys['acc']) speed=Math.min(speed+0.3, nitro>0 && keys['nitro']?12:8);
-  else speed=Math.max(speed-0.1,0);
-  if(keys['ArrowLeft']||keys['left']) angle-=0.05*speed/5;
-  if(keys['ArrowRight']||keys['right']) angle+=0.05*speed/5;
-
-  if((keys['ArrowLeft']||keys['left']||keys['ArrowRight']||keys['right']) && speed>4) drift+=0.5;
-  else drift=Math.max(drift-0.5,0);
-
-  if(keys['nitro'] && nitro>0 && speed>2){ nitro-=0.8; speed+=0.5; }
-
-  x+=Math.sin(angle)*speed; y-=Math.cos(angle)*speed;
-  // keep in road
-  x=Math.max(canvas.width/2-120,Math.min(canvas.width/2+120,x));
-  if(y<0) y=canvas.height-150;
-
-  // draw car
-  ctx.save();ctx.translate(x,y);ctx.rotate(angle);
-  ctx.shadowBlur=drift;ctx.shadowColor='#0ff';
-  ctx.fillStyle=keys['nitro']?'#f0f':'#0ff';ctx.fillRect(-15,-25,30,50);
-  ctx.fillStyle='#000';ctx.fillRect(-15,-25,30,10);
-  ctx.restore();
-
-  document.getElementById('speed').innerText=Math.floor(speed*20);
-  document.getElementById('nitroVal').innerText=Math.floor(nitro);
-  document.getElementById('lap').innerText=`DRIFT: ${Math.floor(drift)}`;
-
-  requestAnimationFrame(loop);
+const cv=document.getElementById('c'),ctx=cv.getContext('2d');
+cv.width=innerWidth;cv.height=innerHeight;
+let road=[],pos=0,speed=0,curve=0,drift=0,lap=1,nitro=100,x=0;
+for(let i=0;i<3000;i++){road.push({c:Math.sin(i/100)*0.8+Math.sin(i/300)*1.5});}
+let k={};
+function draw(){
+ ctx.fillStyle='#0b1a0b';ctx.fillRect(0,0,cv.width,cv.height);
+ let baseY=cv.height*0.4;
+ pos+=speed;
+ if(pos>road.length*10){pos=0;lap++;if(lap>3){alert('RACE FINISHED! 🏁');lap=1;}}
+ let cur=road[Math.floor(pos/10)%road.length].c;
+ curve+=(cur*0.02-curve)*0.1;
+ for(let i=200;i>0;i--){
+   let z=i/200; let p=Math.floor((pos+i*10)/10)%road.length;
+   let rW=cv.width*0.6*z; let rX=cv.width/2 + (road[p].c*300 - x)*z - curve*200*z;
+   let y=baseY + i*2.2*z;
+   ctx.fillStyle=i%2==0?'#2a2a2a':'#333'; ctx.fillRect(rX-rW,y,rW*2,3);
+   if(z>0.3){ctx.fillStyle='white';ctx.fillRect(rX-2,y,4,3);ctx.fillRect(rX-rW,y,10,3);ctx.fillRect(rX+rW-10,y,10,3);}
+ }
+ // car
+ ctx.save();ctx.translate(cv.width/2,cv.height-110);ctx.rotate((curve*0.5+x*0.002)*speed*0.1);
+ ctx.shadowBlur=drift*0.5;ctx.shadowColor='#0ff';
+ ctx.fillStyle=k['n']?'#ff00ff':'#00ffff';ctx.fillRect(-22,-38,44,70);
+ ctx.fillStyle='#001122';ctx.fillRect(-20,-35,40,18);
+ ctx.fillStyle='#000';ctx.fillRect(-26,20,10,16);ctx.fillRect(16,20,10,16);
+ ctx.restore();
+ if(k['a']||k['ArrowUp']) speed=Math.min(speed+(k['n']&&nitro>0?0.08:0.04),k['n']&&nitro>0?1.8:1.2);
+ else speed=Math.max(speed-0.03,0);
+ if(k['l']||k['ArrowLeft']) x-=speed*6; if(k['r']||k['ArrowRight']) x+=speed*6;
+ x*=0.98; if(Math.abs(x)>800) speed*=0.96;
+ if((k['l']||k['r'])&&speed>0.5) drift=Math.min(drift+2,100); else drift=Math.max(drift-3,0);
+ if(k['n']&&nitro>0&&speed>0.3){nitro-=0.6;speed+=0.04;} if(nitro<100&&!k['n']) nitro+=0.15;
+ document.getElementById('sp').innerText=Math.floor(speed*280)+' KM/H';
+ document.getElementById('dr').innerText='DRIFT '+Math.floor(drift);
+ document.getElementById('lp').innerText='LAP '+lap+'/3 NITRO '+Math.floor(nitro)+'%';
+ document.getElementById('prog').style.width=(pos% (road.length*10)/(road.length*10)*100)+'%';
+ requestAnimationFrame(draw);
 }
-loop();
-function bind(id,key){
-  const el=document.getElementById(id);
-  el.addEventListener('touchstart',e=>{e.preventDefault();keys[key]=true});
-  el.addEventListener('touchend',e=>{e.preventDefault();keys[key]=false});
-  el.addEventListener('mousedown',()=>keys[key]=true);
-  el.addEventListener('mouseup',()=>keys[key]=false);
-}
-bind('left','left');bind('right','right');bind('acc','acc');bind('nitro','nitro');
-window.addEventListener('keydown',e=>keys[e.key]=true);
-window.addEventListener('keyup',e=>keys[e.key]=false);
-window.addEventListener('resize',()=>{canvas.width=innerWidth;canvas.height=innerHeight});
+draw();
+function b(id,key){let e=document.getElementById(id);
+e.addEventListener('touchstart',ev=>{ev.preventDefault();k[key]=true});e.addEventListener('touchend',ev=>{ev.preventDefault();k[key]=false});
+e.addEventListener('mousedown',()=>k[key]=true);e.addEventListener('mouseup',()=>k[key]=false);}
+b('l','l');b('r','r');b('a','a');b('n','n');
+addEventListener('keydown',e=>k[e.key]=true);addEventListener('keyup',e=>k[e.key]=false);
+addEventListener('resize',()=>{cv.width=innerWidth;cv.height=innerHeight;});
 </script>
 </body>
 </html>
